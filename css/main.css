@@ -1,0 +1,139 @@
+body {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("../img/vinyl-collection-bg.jpg");
+}
+
+#title {
+    text-align: center;
+}
+
+.js-container-sign-in {
+    /*visibility: visible;*/
+    display:block;
+}
+
+.login-box {
+    background-color: white;
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+    top: 80px;
+    padding-bottom: 30px;
+    border-radius: 5px;
+    box-shadow: 0 5px 50px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.login-box .box-header {
+    padding-top: 10px;
+    padding-bottom: 25px;
+}
+
+#username {
+    width: 80%;
+    text-align: center;
+}
+
+.sign-in button {
+    padding: 15px 40px;
+    background: #000;
+    border: 0;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: 3px;
+    position: relative;
+    transition: all .4s cubic-bezier(0.645, 0.045, 0.355, 1);
+    cursor: pointer;
+    display: block;
+    margin: 50px auto;
+}
+
+#sign-up {
+    position: relative;
+    text-align: center;
+}
+
+#sign-up:hover {
+    color: black;
+    font-weight: bold;
+}
+
+input:not([type]).valid + label:after,
+input:not([type]):focus.valid + label:after,
+input[type=text].valid + label:after,
+input[type=text]:focus.valid + label:after,
+textarea.materialize-textarea.valid + label:after,
+textarea.materialize-textarea:focus.valid + label:after {
+  content: attr(data-success);
+  color: #4CAF50;
+  opacity: 1;
+  padding-left: 17px;
+}
+
+button::after,
+button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0px;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: all .4s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+button::after {
+    width: 30px;
+    height: 1px;
+    background: white;
+    transform: translateX(-3px);
+    margin-top: 0px;
+}
+
+button::before {
+    content: "";
+    transform: rotate(-135deg) translateX(50%);
+    width: 11px;
+    height: 11px;
+    background: transparent;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+    margin-top: -1px;
+}
+
+button:hover {
+    padding: 15px 60px 15px 20px;
+}
+
+button:hover::after,
+button:hover::before {
+    opacity: 1;
+    right: 15px;
+}
+
+img.resize {
+    width: 100px;
+    height: auto;
+}
+
+.card-image {   
+    width: 204px;
+    height: auto;
+}
+
+footer {
+    position: absolute;
+    bottom: 5px;
+    color: white;
+    font-weight: bold;
+    margin-left: 5em;
+}
+
+footer a {
+    padding-left: 2px;
+}
+
+.sources {
+    font-size: 10px;
+}
