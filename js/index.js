@@ -30,75 +30,81 @@ $(function() {
         var user = $('#username').val();
         var user_API_Endpoint = 'https://api.discogs.com/users/' + user;
 
-        // check if username is a valid Discogs username
-        checkDiscogsUserExists(user_API_Endpoint);
-
+        // check username entered is a valid Discogs username
+        var userProfile = checkDiscogsIsValid(user_API_Endpoint);
         // load user location based upon IP address
-        fetchUserLocation();
-        // set sign up elements to hidden
-        //$('.sign-in-page').css('visibility', 'hidden');
-        $('.sign-in-page').css('display', 'none');
+        var userLocation = loadUserLocation();
         // load Discogs collection of the user, no of columns, page 1, limit 50, ascending sort by artist
-        fetchArtistInfo('https://api.discogs.com/artists/84752');
-        fetchDiscogsCollection(user, 1, 1, 'asc');
+        //       fetchArtistInfo('https://api.discogs.com/artists/84752');
+        //      fetchDiscogsCollection(user, 1, 1, 'asc');
         //renderArtistView(1);
+
+        //      url (required), options (optional)
+
     });
 });
 
-function handleErrors(response) {
+// initialize error message, invoked upon click in input field[text]
+function initializeError() {
+    $('label').attr('data-error', ' ');
+}
 
-    if (!response.ok) {
-        throw Error(response.statusText);
-    }
+function handleException(response) {
+
     return response;
 }
 
-function checkDiscogsUserExists(user_API_Endpoint) {
+function hideSignInForm() {
 
-    fetch(user_API_Endpoint)
+    $('.sign-in-page').css('display', 'none')
 
-    .then(handleErrors)
+};
 
-    .then($.get(user_API_Endpoint, function(data) {
+function checkDiscogsIsValid(user_API_Endpoint) {
 
-        musicState.recordCount = data.num_collection;
-        musicState.salesCount = data.num_for_sale;
-        musicState.wantListCount = data.num_wantlist;
-        musicState.registered = data.registered;
-        musicState.username = data.username;
+    $.getJSON(user_API_Endpoint, function() {
+        // set visibility of log-in box elements to none
+        $('.sign-in-page').css('display', 'none');
 
-    })).catch(function(error) {
+    }).done(function(data) {
 
-        console.log(error);
+        var discogsProfile = {
+            recordCount: data.num_collection,
+            salesCount: data.num_for_sale,
+            wantListCount: data.num_wantlist,
+            registered: data.registered,
+            username: data.username
+        }
+
+        return discogsProfile;
+
+    }).fail(function(data) {
+
+        $('Label').attr('data-error', data.responseJSON.message);
+        return false;
+
+    }).always(function() {
 
     });
+
 }
 
-// event listeners
-function fetchUserLocation() {
+function loadUserLocation() {
 
-    // function to get location of user to use for the event lookup 
+    // function to get location of user to use for jambase event lookup 
     $.get('http:freegeoip.net/json/', function(response) {
 
-        //        var Location_API_Endpoint = 'http://ip-api.com/json/' + response.ip + '?';
-        userState.ipAddress = response.ip;
-        userState.userCity = response.city;
+        var geoLocation = {
 
-        //       $.get(Location_API_Endpoint, function(response) {
+            ipAddress: response.ip,
+            userCity: response.city
+        }
 
-        // userState.location = response;
-        // userState.locationHTML += '<table><tr><td>IP Address</td>' + '<td>' + response.query + '</td></tr>';
-        // userState.locationHTML += '<tr><td>City</td>' + '<td>' + response.city + '</td></tr>';
-        // userState.locationHTML += '<tr><td>Region</td>' + '<td>' + response.region + '</td></tr>';
-        // userState.locationHTML += '<tr><td>State</td>' + '<td>' + response.regionName + '</td></tr>';
-        // userState.locationHTML += '<tr><td>Country</td>' + '<td>' + response.country + '</td></tr></table>';
-        //  $('.js-user-location').html(userState.locationHTML).fadeIn();
-        //       });
-
+        return geoLocation;
     });
 }
 
-function fetchDiscogsCollection(user, page, limit, order) {
+function loadDiscogsCollection(user, page, limit, order) {
 
     var discogsCollectionEndpoint = 'https://api.discogs.com/users/' + user + '/collection/folders/0/releases?' + 'page=' + page + '&per_page=' + limit + '&sort=artist' + '&sort_order=' + order;
 
