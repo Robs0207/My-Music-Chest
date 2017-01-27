@@ -26,6 +26,5 @@ You can access the Music Chest site at https://robs0207.github.io/My-Music-Chest
 - Get live events for artists within a certain radius: http://api.jambase.com/events?
 
 * Frameworks used:
-
 - MaterializeCSS v0.97.8: http://materializecss.com/
 - JQuery v2.2.3: https://code.jquery.com/

@@ -24,7 +24,7 @@ function initializeError() {
 function loadUserLocation(discogsPayLoad) {
 
     // function to get location of user to use for jambase event lookup 
-    $.get('http:freegeoip.net/json/', function() {
+    $.get('https:freegeoip.net/json/', function() {
 
     }).done(function(data) {
 
