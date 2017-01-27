@@ -1,48 +1,31 @@
-![alt tag](https://raw.github.com/dogfalo/materialize/master/images/materialize.gif)
-===========
+#Music Chest
+Thinkful (https://www.thinkful.com/) end of Frontend Web Development course portfolio project - a website showing any live events in a given radius for the artists as can be found in the Discogs colection of a (Discogs) user.	   
 
-[![Travis CI](https://travis-ci.org/Dogfalo/materialize.svg?branch=master)](https://travis-ci.org/Dogfalo/materialize)[![devDependency Status](https://david-dm.org/Dogfalo/materialize/dev-status.svg)](https://david-dm.org/Dogfalo/materialize#info=devDependencies)[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/Dogfalo/materialize?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+##Introduction
+The requirement for this website is that you have a collection maintained with Discogs (https://www.discogs.com/) and that this collection is maintained in the root folder (0). To sign in, a Discogs username must be provided. The collection in this site is organized by artist unlike the Discogs collection which is organized by releases.
 
-[Materialize](http://materializecss.com/), a CSS Framework based on material design
-
-### Current Version : v0.97.7
-
-## Sass Requirements:
-- Ruby Sass 3.3+, LibSass 0.6+
-
-## Supported Browsers:
-Chrome 35+, Firefox 31+, Safari 7+, IE 10+
-
-## Changelog
-- v0.97.7 (July 23rd)
-  - Basic horizontal cards
-  - Carousel bug fixes and new features
-  - Updated sidenav styles and new component
-  - Meteor package now supports Sass
-  - Autocomplete form component
-  - Chips jQuery plugin
-- v0.97.6 (April 1st)
-  - **Removed deprecated material icons from project**
-  - **Changed /font directory to /fonts**
-  - Datepicker and ScrollSpy now compatible with jQuery 2.2.x
-  - Responsive tables now work with empty cells
-  - Added focus states to checkboxes, switches, and radio buttons
-  - Sidenav and Modals no longer cause flicker with scrollbar
-  - Materialbox overflow and z-index issues fixed
-  - Added new option for Card actions within a Card reveal
-- v0.97.5 (Dec 21, 2015)
-  - Fixed Meteor package crash
-- v0.97.4 (Dec 20, 2015)
-  - Added Jasmine testing with Travis CI
-  - Select bugfixes
-  - Grid Offset bugfix
-  - Dropdown overflow bugfix
-  - Range slider error bugfix
+##Use Case
+This site will show a Discogs user if any of the artists in his/her Discogs collectionis performing live within a given radius of the user's ip-address. The images of the artists and releases are fetched from LastFM by consuming their artist and albums API's. The images on Discogs are uploaded by users and since the images must be free of any copyright, watermark, URL or other marks, this results in an inconsistent quality.
 
 
+##Live Site
+You can access the Music Chest site at https://robs0207.github.io/My-Music-Chest/
 
-## Contributing
-[Please read CONTRIBUTING.md for more information](CONTRIBUTING.md)
+##Technical
 
-## Testing
-We use Jasmine as our testing framework and we're trying to write a robust test suite for our components. If you want to help, [here's a starting guide on how to write tests in Jasmine](https://docs.google.com/document/d/1dVM6qGt_b_y9RRhr9X7oZfFydaJIEqB9CT7yekv-4XE/edit?usp=sharing)
+* The front-end is built using HTML5, CSS3, JavaScript and Jquery.
+* The UX is based upon Google's Material Design guidelines.
+* The site is fully responsive, adapting for mobile, table and desktop viewports.
+* The following endpoints are called:
+
+** Location of user based upon ip-address: https:freegeoip.net/json/
+** Username entered is valid Discogs username: https://api.discogs.com/users/
+** Discogs collection: https://api.discogs.com/users/<user>/collection/folders/0/releases?
+** Discogs artist: https://www.discogs.com/artist/
+** LastFM images: http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=<artist>&api_key=<api_key>&format=json
+** Get live events for artists within a certain radius: http://api.jambase.com/events?
+
+* Frameworks used:
+
+** MaterializeCSS v0.97.8: http://materializecss.com/
+** JQuery v2.2.3: https://code.jquery.com/
