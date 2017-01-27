@@ -5,7 +5,7 @@ Thinkful (https://www.thinkful.com/) end of Frontend Web Development course port
 The requirement for this website is that you have a collection maintained with Discogs (https://www.discogs.com/) and that this collection is maintained in the root folder (0). To sign in, a Discogs username must be provided. The collection in this site is organized by artist unlike the Discogs collection which is organized by releases.
 
 ##Use Case
-This site will show a Discogs user if any of the artists in his/her Discogs collectionis performing live within a given radius of the user's ip-address. The images of the artists and releases are fetched from LastFM by consuming their artist and albums API's. The images on Discogs are uploaded by users and since the images must be free of any copyright, watermark, URL or other marks, this results in an inconsistent quality.
+This site will show a Discogs user if any of the artists in his/her Discogs collection are performing live within a given radius of the user's ip-address. The images of artists and releases are fetched from LastFM by consuming the artist and albums API's. Images on Discogs are uploaded by users and since the images must be free of any copyright, watermark, URL or other marks, this results in an inconsistent quality.
 
 
 ##Live Site
@@ -16,14 +16,14 @@ You can access the Music Chest site at https://robs0207.github.io/My-Music-Chest
 * The front-end is built using HTML5, CSS3, JavaScript and Jquery.
 * The UX is based upon Google's Material Design guidelines.
 * The site is fully responsive, adapting for mobile, table and desktop viewports.
-* The following endpoints are called:
 
+* The following endpoints are called:
 - Location of user based upon ip-address: https:freegeoip.net/json/
 - Username entered is valid Discogs username: https://api.discogs.com/users/
 - Discogs collection: https://api.discogs.com/users/<user>/collection/folders/0/releases?
 - Discogs artist: https://www.discogs.com/artist/
-- LastFM images: http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=<artist>&api_key=<api_key>&format=json
-- Get live events for artists within a certain radius: http://api.jambase.com/events?
+- LastFM images: http://ws.audioscrobbler.com/2.0/?
+- Live events for artists within a certain radius: http://api.jambase.com/events?
 
 * Frameworks used:
 - MaterializeCSS v0.97.8: http://materializecss.com/
