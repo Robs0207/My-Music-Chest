@@ -24,7 +24,7 @@ function initializeError() {
 function loadUserLocation(discogsPayLoad) {
 
     // function to get location of user to use for jambase event lookup 
-    $.get('https:freegeoip.net/json/', function() {
+    $.get('http:freegeoip.net/json/', function() {
 
     }).done(function(data) {
 
@@ -194,7 +194,7 @@ function loadLastFMImages(discogsPayLoad) {
 
     $.each(discogsPayLoad.artists, function(i, data) {
 
-        var lastFMScrobber = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=' + discogsPayLoad.artists[i].name + '&api_key=a9ec7949488cffd19b50fc457a7731d1&format=json';
+        var lastFMScrobber = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=' + discogsPayLoad.artists[i].name + '&api_key=a9ec7949488cffd19b50fc457a7731d1&format=json';
         debugger;
         $.getJSON(lastFMScrobber, function(data) {
 
