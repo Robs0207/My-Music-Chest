@@ -10,7 +10,7 @@ $(function() {
         var discogsUsersEndpoint = 'https://api.discogs.com/users/' + user;
 
         // check username entered is a valid Discogs username
-        var discogsPayLoad = checkDiscogsIsValid(user, discogsUsersEndpoint);
+        checkDiscogsIsValid(user, discogsUsersEndpoint);
 
     });
 });
@@ -30,6 +30,8 @@ function loadUserLocation(discogsPayLoad) {
 
         var userLocation = {};
         userLocation.city = data.city;
+        userLocation.region_code = data.region_code;
+        userLocation.zip_code = data.zip_code;
         userLocation.country = data.country_name;
         renderInfoBox(userLocation, discogsPayLoad);
 
@@ -43,9 +45,11 @@ function loadUserLocation(discogsPayLoad) {
 function checkDiscogsIsValid(user, discogsUsersEndpoint) {
 
     $.getJSON(discogsUsersEndpoint, function() {
+
         // set visibility of log-in box elements to none
         $('.sign-in-page').css('display', 'none');
-        
+        $('.loading').css('display', ' ');
+
     }).done(function(data) {
 
         var discogsPayLoad = new Object();
@@ -58,7 +62,7 @@ function checkDiscogsIsValid(user, discogsUsersEndpoint) {
 
         if (discogsPayLoad.recordCount > 0) {
             // load Discogs collection of the user, page 1, limit 50, ascending sort by artist
-            loadDiscogsReleases(discogsPayLoad, user, 1, 20, 'asc');
+            loadDiscogsReleases(discogsPayLoad, user, 1, 200, 'asc');
 
         } else {
 
@@ -78,6 +82,7 @@ function checkDiscogsIsValid(user, discogsUsersEndpoint) {
             $('Label').attr('data-error', data.responseJSON.message);
 
         }
+
         return false;
 
     }).always(function() {
@@ -111,7 +116,7 @@ function loadDiscogsReleases(discogsPayLoad, user, page, limit, order) {
 
                     var artistObj = {};
                     artistObj.albums = [];
-                    artistObj.members = [];
+                    artistObj.tags = [];
 
                     artistId = data.releases[i].basic_information.artists[j].id;
                     artistObj.artistid = data.releases[i].basic_information.artists[j].id;
@@ -132,7 +137,8 @@ function loadDiscogsReleases(discogsPayLoad, user, page, limit, order) {
 
         discogsPayLoad.artists.push(artistObj);
 
-        enrichDiscogsArtists(discogsPayLoad);
+        loadLastFMArtist(discogsPayLoad);
+
 
     }).fail(function(data, success) {
 
@@ -143,65 +149,19 @@ function loadDiscogsReleases(discogsPayLoad, user, page, limit, order) {
     });
 }
 
-function enrichDiscogsArtists(discogsPayLoad) {
-
-    $.each(discogsPayLoad.artists, function(i, data) {
-
-        $.getJSON(discogsPayLoad.artists[i].url, function(data) {
-
-        }).done(function(data) {
-
-            var artistObj = {};
-            artistObj.members = [];
-
-            discogsPayLoad.artists[i].profile = data.profile;
-
-            var activeMembersCount = 0;
-            for (var j = data.members.length - 1; j >= 0; j--) {
-
-                if (data.members[j].active === true) {
-
-                    var membersObj = {};
-                    membersObj.name = data.members[j].name;
-                    membersObj.active = data.members[j].active;
-                    artistObj.members.push(membersObj);
-
-                    activeMembersCount++;
-                }
-
-                if (activeMembersCount >= 6) {
-                    break; // only want to show 6 active members
-                }
-
-            }
-
-            discogsPayLoad.artists[i].members = artistObj.members;
-
-            loadLastFMImages(discogsPayLoad);
-
-        }).fail(function(data, success) {
-
-            renderLoadingErrorView('Discogs', data);
-
-        }).always(function() {
-
-        });
-
-    });
-}
-
-function loadLastFMImages(discogsPayLoad) {
+function loadLastFMArtist(discogsPayLoad) {
 
     $.each(discogsPayLoad.artists, function(i, data) {
 
         var lastFMScrobber = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=' + discogsPayLoad.artists[i].name + '&api_key=a9ec7949488cffd19b50fc457a7731d1&format=json';
-        debugger;
+
         $.getJSON(lastFMScrobber, function(data) {
 
         }).done(function(data) {
 
             var keys = Object.keys(data.artist.image);
-            var result = {};
+
+            discogsPayLoad.artists[i].profile = data.artist.bio.content;
 
             for (var j = data.artist.image.length - 1; j >= 0; j--) {
 
@@ -214,6 +174,21 @@ function loadLastFMImages(discogsPayLoad) {
                 }
             }
 
+            var artistObj = {};
+            artistObj.tags = [];
+
+            for (var j = data.artist.tags.tag.length - 1; j >= 0; j--) {
+
+                var tagObj = {};
+                tagObj.name = data.artist.tags.tag[j].name;
+                tagObj.url = data.artist.tags.tag[j].url;
+                artistObj.tags.push(tagObj);
+            }
+
+            discogsPayLoad.artists[i].tags = artistObj.tags;
+
+            //      loadJamBase(discogsPayLoad);
+            $('.loading').css('display', 'none');
             renderArtistCards(discogsPayLoad);
             loadUserLocation(discogsPayLoad);
 
@@ -228,12 +203,43 @@ function loadLastFMImages(discogsPayLoad) {
     });
 }
 
+function loadJamBase(discogsPayLoad) {
+
+    $.each(discogsPayLoad.artists, function(i, data) {
+
+        var JamBaseArtistApi = 'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+
+        $.getJSON(JamBaseArtistApi, function(data) {
+
+        }).done(function(data) {
+
+            for (var j = data.Artists.length - 1; j >= 0; j--) {
+
+                discogsPayLoad.artists[i].jamBaseId = data.Artists[j].Id;
+//                  var JamBaseEventApi = 'http://api.jambase.com/events?artistId=' + data.Artists[j].Id + '&zipCode=98105&radius=50&' + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+            }
+
+            $('.loading').css('display', 'none');
+            renderArtistCards(discogsPayLoad);
+            loadUserLocation(discogsPayLoad);
+
+        }).fail(function(data, success) {
+
+            renderLoadingErrorView('JamBase', data);
+
+        }).always(function() {
+
+        });
+
+    });
+}
+
 function renderInfoBox(userLocation, discogsPayLoad) {
 
     var infoBoxHTML = '';
 
     infoBoxHTML += '<div class="js-info-heading"><span><p class="black-text text-darken-2">Location Information:</p></span></div>';
-    infoBoxHTML += '<p>City: ' + userLocation.city + '</p>';
+    infoBoxHTML += '<p>City: ' + userLocation.city + ' ' + userLocation.region_code + ' ' + userLocation.zip_code + '</p>';
     infoBoxHTML += '<p>Country: ' + userLocation.country + '</p>';
 
     if (discogsPayLoad != undefined) {
@@ -260,6 +266,7 @@ function renderEmptyCollectionView() {
 
     // set visibility of main page element to none
     $('.js-main-page').css('display', 'none');
+    $('.loading').css('display', 'none');
     // render empty collection message box
     $('.js-message-box').html(messageHTML).fadeIn();
     $('.js-message-box').css('visibility', 'visible');
@@ -281,23 +288,12 @@ function renderLoadingErrorView(api, data) {
 
     // set visibility of main page element to none
     $('.js-main-page').css('display', 'none');
+    $('.loading').css('display', 'none');
     // render empty collection message box  
     $('.js-message-box').html(messageHTML).fadeIn();
     $('.js-message-box').css('visibility', 'visible');
 
 }
-
-jQuery(function($) {
-    var target = $('#target');
-
-    $('.toggle-loading').click(function() {
-        if (target.hasClass('loading')) {
-            target.loadingOverlay('remove');
-        } else {
-            target.loadingOverlay();
-        };
-    });
-});
 
 function renderArtistCards(discogsPayLoad) {
 
@@ -315,7 +311,7 @@ function renderArtistCards(discogsPayLoad) {
 
         counter++;
         artistHTML += '<div class="col s3 z-depth-3">';
-        //artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
+        //    artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
         artistHTML += '<div class="card hoverable">';
         artistHTML += '<div class="card-image waves-effect waves-block waves-light">';
         artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
@@ -331,41 +327,17 @@ function renderArtistCards(discogsPayLoad) {
 
         artistHTML += '</div>'; //  closing tag card image
         artistHTML += '<div class="card-content">';
-        artistHTML += '<span class="card-title activator grey-text text-darken-4">' + 'Members' + '<i class="material-icons right">' + 'more_vert' + '</i></span>';
 
-        if (discogsPayLoad.artists[i].members === undefined) {
+        if (discogsPayLoad.artists[i].tags === undefined) {
 
-            artistHTML += '<p>No active members found</p>';
+            artistHTML += '<p></p>';
 
         } else {
 
-            artistHTML += '<table><tbody>';
+            for (var j = discogsPayLoad.artists[i].tags.length - 1; j >= 0; j--) {
 
-            var memberCount = 0;
-            for (var j = discogsPayLoad.artists[i].members.length - 1; j >= 0; j--) {
-
-                if (memberCount === 0) { artistHTML += '<tr>'; }
-                memberCount++;
-                artistHTML += '<td>' + discogsPayLoad.artists[i].members[j].name + '</td>';
-                if (memberCount === 2) {
-                    artistHTML += '</tr>';
-                    memberCount = 0;
-                }
+                artistHTML += '<div class="chip"><a href="' + discogsPayLoad.artists[i].tags[j].url + '" target="newtab">' + discogsPayLoad.artists[i].tags[j].name + '</a></div>';
             }
-
-            var emptyMembers = 6 - discogsPayLoad.artists[i].members.length
-            if (discogsPayLoad.artists[i].members.length === 0) {
-                artistHTML += '<tr><td></td></tr>';
-                artistHTML += '<tr><td></td></tr>';
-                artistHTML += '<tr><td></td></tr>';
-            } else if (discogsPayLoad.artists[i].members.length === 1 || discogsPayLoad.artists[i].members.length === 2) {
-                artistHTML += '<tr><td></td></tr>';
-                artistHTML += '<tr><td></td></tr>';
-            } else if (discogsPayLoad.artists[i].members.length === 3 || discogsPayLoad.artists[i].members.length === 4) {
-                artistHTML += '<tr><td></td></tr>';
-            }
-
-            artistHTML += '</tbody></table>';
         }
 
         artistHTML += '</div>'; //  closing tag card content
@@ -431,7 +403,8 @@ function renderAlbumView(response, noOfColumns) {
 }
 
 $(document).ready(function() {
-
+    debugger;
+    $('.loading').css('display', 'none');
     loadUserLocation();
 
 });
