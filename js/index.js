@@ -189,7 +189,7 @@ function loadLastFMArtist(discogsPayLoad) {
 
                     var tagObj = {};
                     if ((data.artist.tags.tag[j].name != 'seen live') && (data.artist.tags.tag[j].name != 'stroboscopic trip')
-                        && (data.artist.tags.tag[j].name != 'Minnesota') && && (data.artist.tags.tag[j].name != 'Canadian')) {
+                        && (data.artist.tags.tag[j].name != 'Minnesota') && (data.artist.tags.tag[j].name != 'Canadian')) {
                         tagObj.name = data.artist.tags.tag[j].name;
                         tagObj.url = data.artist.tags.tag[j].url;
                         artistObj.tags.push(tagObj);
@@ -361,7 +361,6 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '<div class="card-action">';
 
         if (discogsPayLoad.artists[i].onTour === '1') {
-            console.log(discogsPayLoad.artists[i]);
             artistHTML += '<a href="https://www.jambase.com/band/' + discogsPayLoad.artists[i].name + '" target="newtab">' + 'On Tour' + '</a>';
         }
 
