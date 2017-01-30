@@ -48,7 +48,7 @@ function checkDiscogsIsValid(user, discogsUsersEndpoint) {
 
         // set visibility of log-in box elements to none
         $('.sign-in-page').css('display', 'none');
-        $('.loading').css('display', ' ');
+        $('.loading').css('display', 'inline');
 
     }).done(function(data) {
 
@@ -159,35 +159,51 @@ function loadLastFMArtist(discogsPayLoad) {
 
         }).done(function(data) {
 
-            var keys = Object.keys(data.artist.image);
+            if (data.error === 6) {
 
-            discogsPayLoad.artists[i].profile = data.artist.bio.content;
+                discogsPayLoad.artists[i].image = '';
+                discogsPayLoad.artists[i].profile = data.message;
 
-            for (var j = data.artist.image.length - 1; j >= 0; j--) {
+            } else {
 
-                if (data.artist.image[j].size === 'large') {
+                var keys = Object.keys(data.artist.image);
 
-                    var str = JSON.stringify(data.artist.image[j]);
-                    str = str.replace('#text', 'text');
-                    data.artist.image[j] = JSON.parse(str);
-                    discogsPayLoad.artists[i].image = data.artist.image[j].text;
+                discogsPayLoad.artists[i].profile = data.artist.bio.content;
+                discogsPayLoad.artists[i].onTour = data.artist.ontour;
+
+                for (var j = data.artist.image.length - 1; j >= 0; j--) {
+
+                    if (data.artist.image[j].size === 'large') {
+
+                        var str = JSON.stringify(data.artist.image[j]);
+                        str = str.replace('#text', 'text');
+                        data.artist.image[j] = JSON.parse(str);
+                        discogsPayLoad.artists[i].image = data.artist.image[j].text;
+                    }
                 }
+
+                var artistObj = {};
+                artistObj.tags = [];
+
+                for (var j = data.artist.tags.tag.length - 1; j >= 0; j--) {
+
+                    var tagObj = {};
+                    if ((data.artist.tags.tag[j].name != 'seen live') && (data.artist.tags.tag[j].name != 'stroboscopic trip')
+                        && (data.artist.tags.tag[j].name != 'Minnesota') && && (data.artist.tags.tag[j].name != 'Canadian')) {
+                        tagObj.name = data.artist.tags.tag[j].name;
+                        tagObj.url = data.artist.tags.tag[j].url;
+                        artistObj.tags.push(tagObj);
+                    }
+                }
+
+                discogsPayLoad.artists[i].tags = artistObj.tags;
+
             }
 
-            var artistObj = {};
-            artistObj.tags = [];
-
-            for (var j = data.artist.tags.tag.length - 1; j >= 0; j--) {
-
-                var tagObj = {};
-                tagObj.name = data.artist.tags.tag[j].name;
-                tagObj.url = data.artist.tags.tag[j].url;
-                artistObj.tags.push(tagObj);
+            if (discogsPayLoad.artists[i].onTour === '1') {
+                //   loadJamBase(i, discogsPayLoad);
             }
 
-            discogsPayLoad.artists[i].tags = artistObj.tags;
-
-            //      loadJamBase(discogsPayLoad);
             $('.loading').css('display', 'none');
             renderArtistCards(discogsPayLoad);
             loadUserLocation(discogsPayLoad);
@@ -199,37 +215,34 @@ function loadLastFMArtist(discogsPayLoad) {
         }).always(function() {
 
         });
-
     });
 }
 
-function loadJamBase(discogsPayLoad) {
+function loadJamBase(i, discogsPayLoad) {
 
-    $.each(discogsPayLoad.artists, function(i, data) {
+    var JamBaseArtistApi = 'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
 
-        var JamBaseArtistApi = 'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+    $.getJSON(JamBaseArtistApi, function(data) {
 
-        $.getJSON(JamBaseArtistApi, function(data) {
+    }).done(function(data) {
 
-        }).done(function(data) {
+        for (var j = data.Artists.length - 1; j >= 0; j--) {
 
-            for (var j = data.Artists.length - 1; j >= 0; j--) {
-
+            if (data.Artists[j].Name === discogsPayLoad.artists[i].name) {
                 discogsPayLoad.artists[i].jamBaseId = data.Artists[j].Id;
-//                  var JamBaseEventApi = 'http://api.jambase.com/events?artistId=' + data.Artists[j].Id + '&zipCode=98105&radius=50&' + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+                //var JamBaseEventApi = 'http://api.jambase.com/events?artistId=' + data.Artists[j].Id + '&zipCode=98105&radius=50&' + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
             }
+        }
 
-            $('.loading').css('display', 'none');
-            renderArtistCards(discogsPayLoad);
-            loadUserLocation(discogsPayLoad);
+        $('.loading').css('display', 'none');
+        renderArtistCards(discogsPayLoad);
+        loadUserLocation(discogsPayLoad);
 
-        }).fail(function(data, success) {
+    }).fail(function(data, success) {
 
-            renderLoadingErrorView('JamBase', data);
+        renderLoadingErrorView('JamBase', data);
 
-        }).always(function() {
-
-        });
+    }).always(function() {
 
     });
 }
@@ -311,7 +324,6 @@ function renderArtistCards(discogsPayLoad) {
 
         counter++;
         artistHTML += '<div class="col s3 z-depth-3">';
-        //    artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
         artistHTML += '<div class="card hoverable">';
         artistHTML += '<div class="card-image waves-effect waves-block waves-light">';
         artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
@@ -347,7 +359,12 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '</div>'; //  closing tag card reveal
         artistHTML += '<div class="card-stacked">';
         artistHTML += '<div class="card-action">';
-        artistHTML += '<a href="#">' + 'Live Events' + '</a>';
+
+        if (discogsPayLoad.artists[i].onTour === '1') {
+            console.log(discogsPayLoad.artists[i]);
+            artistHTML += '<a href="https://www.jambase.com/band/' + discogsPayLoad.artists[i].name + '" target="newtab">' + 'On Tour' + '</a>';
+        }
+
         artistHTML += '</div>'; //  closing tag card action
         artistHTML += '</div>'; //  closing tag card stacked
         artistHTML += '</div>'; //  closing tag card type
@@ -403,7 +420,7 @@ function renderAlbumView(response, noOfColumns) {
 }
 
 $(document).ready(function() {
-    debugger;
+
     $('.loading').css('display', 'none');
     loadUserLocation();
 
