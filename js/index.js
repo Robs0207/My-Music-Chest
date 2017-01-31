@@ -220,7 +220,8 @@ function loadLastFMArtist(discogsPayLoad) {
 
 function loadJamBase(i, discogsPayLoad) {
 
-    var JamBaseArtistApi = 'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+  var JamBaseArtistApi =
+    'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
 
     $.getJSON(JamBaseArtistApi, function(data) {
 
@@ -314,17 +315,14 @@ function renderArtistCards(discogsPayLoad) {
     var counter = 0;
     var noOfColumns = 4;
 
+    artistHTML += '<div class="row">';
+  
     // loop over Discogs data load and render page
     for (var i = discogsPayLoad.artists.length - 1; i >= 0; i--) {
 
-        if (counter === 0) {
-
-            artistHTML += '<div class="row">';
-        }
-
         counter++;
-        artistHTML += '<div class="col s3 z-depth-3">';
-        artistHTML += '<div class="card hoverable">';
+        artistHTML += '<div class="col s12 m4 l3 z-depth-3">';
+        artistHTML += '<div class="card large hoverable">';
         artistHTML += '<div class="card-image waves-effect waves-block waves-light">';
         artistHTML += '<div class="white-text text-white thin"><span class="card-title"><h5>' + discogsPayLoad.artists[i].name + '<h5></span></div>';
 
@@ -368,13 +366,9 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '</div>'; //  closing tag card stacked
         artistHTML += '</div>'; //  closing tag card type
         artistHTML += '</div>'; //  closing tag column
-
-        if (counter === noOfColumns) {
-
-            counter = 0;
-            artistHTML += '</div>'; // closing tag row
-        }
     }
+
+    artistHTML += '</div>';
 
     // render artist cards
     $('.js-main-view').html(artistHTML).fadeIn();
