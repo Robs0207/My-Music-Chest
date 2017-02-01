@@ -23,7 +23,7 @@ You can access the Music Chest site at https://robs0207.github.io/My-Music-Chest
 - Discogs collection: https://api.discogs.com/users/<user>/collection/folders/0/releases?
 - Discogs artist: https://www.discogs.com/artist/
 - LastFM images: http://ws.audioscrobbler.com/2.0/?
-- Live events for artists within a certain radius: http://api.jambase.com/events?
+- Live events for artists within a certain radius: http://api.bandsintown.com/artists?
 
 * Frameworks used:
 - MaterializeCSS v0.97.8: http://materializecss.com/
