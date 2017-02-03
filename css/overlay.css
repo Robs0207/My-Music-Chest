@@ -1,5 +1,5 @@
 /* Absolute Center Spinner */
-.loading {
+.js-loading {
   position: fixed;
   z-index: 999;
   height: 2em;
@@ -13,7 +13,7 @@
 }
 
 /* Transparent Overlay */
-.loading:before {
+.js-loading:before {
   content: '';
   display: block;
   position: fixed;
@@ -25,22 +25,8 @@
 }
 
 
-.loading-text {
-  font-size: 0.875rem;
-  line-height: 1.3125rem;
-  color: white;
-  /*text-shadow: white 0 0 1em, white 0 0 0.5em, white 0 0 0.25em;*/
-  display: inline;
-  position: absolute;
-  padding-top: 40px;
-  margin-top: 10px;
-/*  text-align: center;
-  text-transform: uppercase;
-  font-weight: bold;*/
-}
-
 /* :not(:required) hides these rules from IE9 and below */
-.loading:not(:required) {
+.js-loading:not(:required) {
   /* hide "loading..." text */
   font: 0/0 a;
   color: transparent;
@@ -49,7 +35,7 @@
   border: 0;
 }
 
-.loading:not(:required):after {
+.js-loading:not(:required):after {
   content: ' ';
   display: block;
   font-size: 10px;
@@ -67,7 +53,6 @@
 }
 
 /* Animation */
-
 @-webkit-keyframes spinner {
   0% {
     -webkit-transform: rotate(0deg);
