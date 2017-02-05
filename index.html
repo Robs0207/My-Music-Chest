@@ -19,29 +19,25 @@
 </head>
 
 <body>
-    <div class="loading"></div>
-    <div class="container sign-in-page">
-        <div class="top">
-            <h1 id="title" class="white-text text-white thin">My Music Chest</h1>
-        </div>
-        <div id="sign-in" class="login-box animated fadeInUp">
-            <div class="box-header">
-                <h2 class="thin">Sign In</h2>
+    <div class="js-loading"></div>
+    <div class="js-sign-in-view">
+        <h1 id="title" class="white-text text-white thin">My Music Chest</h1>
+        <div class="js-sign-in">
+            <div id="sign-in" class="sign-in-box animated fadeInUp">
+                <div class="box-header">
+                    <h2 class="thin">Sign In</h2>
+                </div>
+                <form id="sign-in-form">
+                    <div class="input-field">
+                        <input type="text" id="username" required class="validate" onclick="initializeError()">
+                        <label for="username" class="grey-text text-darken-2" data-error=" ">Enter your Discogs username</label>
+                    </div>
+                    <h6 class="sign-up grey-text text-darken-2"><a class="grey-text text-darken-2" href="https://www.discogs.com/users/create"> <span id="sign-up">No Discogs account, sign up here</span></a></h6>
+                    <div id="sign-in" class="sign-in">
+                        <button type="submit">Sign In</button>
+                    </div>
+                </form>
             </div>
-            <form id="sign-in-form">
-                <div class="input-field">
-                    <input type="text" id="username" required class="validate" onclick="initializeError()">
-                    <label for="username" class="grey-text text-darken-2" data-error=" ">Enter your Discogs username</label>
-                </div>
-                <h6 class="sign-up grey-text text-darken-2">
-                <a class="grey-text text-darken-2" href="https://www.discogs.com/users/create">
-                       <span id="sign-up">No Discogs account, sign up here</span>
-                </a>
-            </h6>
-                <div id="sign-in" class="sign-in">
-                    <button type="submit">Sign In</button>
-                </div>
-            </form>
         </div>
     </div>
     <div class="js-message-box"></div>
@@ -55,11 +51,11 @@
     <footer>
         <div class="sources">
             <p>Website powered by:</p>
-            <p><span><a href="https://www.discogs.com/"><img class="resize" alt="Discogs" src="img/discogs logo white.png"></a>
-            <a href="https://www.discogs.com/"><img class="resize" alt="LastFM" src="img/lastfm-logo.png"></a></span>
-                <a href="http://www.JamBase.com"><img class="resize" alt="Jambase" src="img/jambase-logo.png"></a>
-                </span>
-            </p>
+            <p><span>
+            <a href="https://www.discogs.com/my"><img class="resize" alt="Discogs" src="img/discogs-logo.png"></a>
+            <a href="http://www.last.fm/home"><img class="resize" alt="LastFM" src="img/lastfm-logo.png"></a>
+            <a href="http://corp.bandsintown.com"><img class="resize" alt="BandsInTown" src="img/bit-logo.png"></a>
+            </span></p>
         </div>
     </footer>
     <!-- Import jQuery before materialize.min.js-->

@@ -1,5 +1,7 @@
 "use strict";
 
+var userLocation = {};
+
 $(function() {
 
     // handle log in event
@@ -28,12 +30,13 @@ function loadUserLocation(discogsPayLoad) {
 
     }).done(function(data) {
 
-        var userLocation = {};
+        //var userLocation = {};
         userLocation.city = data.city;
         userLocation.region_code = data.region_code;
         userLocation.zip_code = data.zip_code;
         userLocation.country = data.country_name;
         renderInfoBox(userLocation, discogsPayLoad);
+        return userLocation;
 
     }).fail(function(data) {
 
@@ -46,9 +49,10 @@ function checkDiscogsIsValid(user, discogsUsersEndpoint) {
 
     $.getJSON(discogsUsersEndpoint, function() {
 
-        // set visibility of log-in box elements to none
-        $('.sign-in-page').css('display', 'none');
-        $('.loading').css('display', 'inline');
+        /// set display of sign-in view to none
+        $('.js-sign-in-view').css('display', 'none');
+        // display pre-loader
+        $('.js-loading').css('display', 'inline');
 
     }).done(function(data) {
 
@@ -188,8 +192,7 @@ function loadLastFMArtist(discogsPayLoad) {
                 for (var j = data.artist.tags.tag.length - 1; j >= 0; j--) {
 
                     var tagObj = {};
-                    if ((data.artist.tags.tag[j].name != 'seen live') && (data.artist.tags.tag[j].name != 'stroboscopic trip')
-                        && (data.artist.tags.tag[j].name != 'Minnesota') && (data.artist.tags.tag[j].name != 'Canadian')) {
+                    if ((data.artist.tags.tag[j].name != 'seen live') && (data.artist.tags.tag[j].name != 'stroboscopic trip') && (data.artist.tags.tag[j].name != 'Minnesota') && (data.artist.tags.tag[j].name != 'Canadian')) {
                         tagObj.name = data.artist.tags.tag[j].name;
                         tagObj.url = data.artist.tags.tag[j].url;
                         artistObj.tags.push(tagObj);
@@ -201,12 +204,14 @@ function loadLastFMArtist(discogsPayLoad) {
             }
 
             if (discogsPayLoad.artists[i].onTour === '1') {
-                //   loadJamBase(i, discogsPayLoad);
+                loadBandsInTown(i, discogsPayLoad, userLocation);
             }
 
-            $('.loading').css('display', 'none');
+            // set display of pre-loader to none
+            $('.js-loading').css('display', 'none');
             renderArtistCards(discogsPayLoad);
-            loadUserLocation(discogsPayLoad);
+            renderInfoBox(userLocation, discogsPayLoad);
+            // loadUserLocation(discogsPayLoad);
 
         }).fail(function(data, success) {
 
@@ -218,30 +223,30 @@ function loadLastFMArtist(discogsPayLoad) {
     });
 }
 
-function loadJamBase(i, discogsPayLoad) {
+function loadBandsInTown(i, discogsPayLoad, userLocation) {
 
-  var JamBaseArtistApi =
-    'http://api.jambase.com/artists?name=' + discogsPayLoad.artists[i].name + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
+    var BandsInTownApi =
+        'http://api.bandsintown.com/artists/' + discogsPayLoad.artists[i].name + '/events/search.jsonp?api_version=2.0&app_id=MyMusicChest&location=' + userLocation.city + ',' + userLocation.region_code + '&radius=50';
 
-    $.getJSON(JamBaseArtistApi, function(data) {
+    $.getJSON(BandsInTownApi, function(data) {
 
     }).done(function(data) {
 
-        for (var j = data.Artists.length - 1; j >= 0; j--) {
 
-            if (data.Artists[j].Name === discogsPayLoad.artists[i].name) {
-                discogsPayLoad.artists[i].jamBaseId = data.Artists[j].Id;
-                //var JamBaseEventApi = 'http://api.jambase.com/events?artistId=' + data.Artists[j].Id + '&zipCode=98105&radius=50&' + '&page=0&api_key=mdu9gtkextqses89k84sb9b6&o=json';
-            }
+        if (data === '') {
+
+            discogsPayLoad.artists[i].onTour === '0';
+            discogsPayLoad.artists[i].eventURL = ' ';
+
+        } else {
+
+            discogsPayLoad.artists[i].eventURL = data.ticket_url;
         }
 
-        $('.loading').css('display', 'none');
-        renderArtistCards(discogsPayLoad);
-        loadUserLocation(discogsPayLoad);
 
-    }).fail(function(data, success) {
+    }).fail(function(data) {
 
-        renderLoadingErrorView('JamBase', data);
+      //  renderLoadingErrorView('BandsInTown', data);
 
     }).always(function() {
 
@@ -272,15 +277,15 @@ function renderInfoBox(userLocation, discogsPayLoad) {
 
 function renderEmptyCollectionView() {
 
-    var messageHTML = '<div id="floater"></div>';
+    var messageHTML = '<div class="js-floater"></div>';
 
     messageHTML += '<div class="js-message"><span><h4 class="thin white-text text-darken-2">Empty Collection</h4></span>';
     messageHTML += '<p>No records are maintained in your Discogs collection</p>';
     messageHTML += '<p>and therefore nothing to show.</p></div>';
 
-    // set visibility of main page element to none
+    // set display of main page and pre-loader to none
     $('.js-main-page').css('display', 'none');
-    $('.loading').css('display', 'none');
+    $('.js-loading').css('display', 'none');
     // render empty collection message box
     $('.js-message-box').html(messageHTML).fadeIn();
     $('.js-message-box').css('visibility', 'visible');
@@ -289,20 +294,18 @@ function renderEmptyCollectionView() {
 
 function renderLoadingErrorView(api, data) {
 
-    var messageHTML = '<div id="floater"></div>';
+    var messageHTML = '<div class="js-floater"></div>';
 
     messageHTML += '<div class="js-message"><span><h4 class="thin white-text text-darken-2">Load Error</h4></span>';
     messageHTML += '<p>Unable to load all information since ' + api + ' API returned following error:</p>';
 
-    if (data.status != 0) {
-        messageHTML += '<p>HTTP code ' + data.status + ' - ' + data.statusText + '</p></div>';
-    } else {
-        messageHTML += '<p>HTTP code 429 (Too Many Requests) No Access-Control-Allow-Origin present</p></div>';
-    }
 
-    // set visibility of main page element to none
+    messageHTML += '<p>HTTP code ' + data.status + ' - ' + data.statusText + '</p></div>';
+
+
+    // set display of main page and pre-loader to none
     $('.js-main-page').css('display', 'none');
-    $('.loading').css('display', 'none');
+    $('.js-loading').css('display', 'none');
     // render empty collection message box  
     $('.js-message-box').html(messageHTML).fadeIn();
     $('.js-message-box').css('visibility', 'visible');
@@ -316,7 +319,7 @@ function renderArtistCards(discogsPayLoad) {
     var noOfColumns = 4;
 
     artistHTML += '<div class="row">';
-  
+
     // loop over Discogs data load and render page
     for (var i = discogsPayLoad.artists.length - 1; i >= 0; i--) {
 
@@ -359,7 +362,7 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '<div class="card-action">';
 
         if (discogsPayLoad.artists[i].onTour === '1') {
-            artistHTML += '<a href="https://www.jambase.com/band/' + discogsPayLoad.artists[i].name + '" target="newtab">' + 'On Tour' + '</a>';
+            artistHTML += '<a href="' + discogsPayLoad.artists[i].eventURL + '" target="newtab">' + 'On Tour' + '</a>';
         }
 
         artistHTML += '</div>'; //  closing tag card action
@@ -414,7 +417,7 @@ function renderAlbumView(response, noOfColumns) {
 
 $(document).ready(function() {
 
-    $('.loading').css('display', 'none');
+    $('.js-loading').css('display', 'none');
     loadUserLocation();
 
 });
