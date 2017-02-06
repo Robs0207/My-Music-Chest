@@ -207,12 +207,6 @@ function loadLastFMArtist(discogsPayLoad) {
                 loadBandsInTown(i, discogsPayLoad, userLocation);
             }
 
-            // set display of pre-loader to none
-            $('.js-loading').css('display', 'none');
-            renderArtistCards(discogsPayLoad);
-            renderInfoBox(userLocation, discogsPayLoad);
-            // loadUserLocation(discogsPayLoad);
-
         }).fail(function(data, success) {
 
             renderLoadingErrorView('LastFM', data);
@@ -225,28 +219,24 @@ function loadLastFMArtist(discogsPayLoad) {
 
 function loadBandsInTown(i, discogsPayLoad, userLocation) {
 
-    var BandsInTownApi =
-        'http://api.bandsintown.com/artists/' + discogsPayLoad.artists[i].name + '/events/search.jsonp?api_version=2.0&app_id=MyMusicChest&location=' + userLocation.city + ',' + userLocation.region_code + '&radius=50';
-
+    var BandsInTownApi = 'http://api.bandsintown.com/artists/' + discogsPayLoad.artists[i].name + '/events/search.json?callback=?&api_version=2.0&app_id=my music chest&location=' + userLocation.city + ',' + userLocation.region_code + '&radius=50';
     $.getJSON(BandsInTownApi, function(data) {
 
     }).done(function(data) {
 
-
-        if (data === '') {
-
-            discogsPayLoad.artists[i].onTour === '0';
-            discogsPayLoad.artists[i].eventURL = ' ';
-
-        } else {
-
-            discogsPayLoad.artists[i].eventURL = data.ticket_url;
+        if (data.length != 0) {
+            var eventObj = data[0];
+            discogsPayLoad.artists[i].event = eventObj;
         }
 
+        // set display of pre-loader to none
+        $('.js-loading').css('display', 'none');
+        renderArtistCards(discogsPayLoad);
+        renderInfoBox(userLocation, discogsPayLoad);
 
     }).fail(function(data) {
 
-      //  renderLoadingErrorView('BandsInTown', data);
+        renderLoadingErrorView('BandsInTown', data);
 
     }).always(function() {
 
@@ -361,8 +351,9 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '<div class="card-stacked">';
         artistHTML += '<div class="card-action">';
 
-        if (discogsPayLoad.artists[i].onTour === '1') {
-            artistHTML += '<a href="' + discogsPayLoad.artists[i].eventURL + '" target="newtab">' + 'On Tour' + '</a>';
+        if (discogsPayLoad.artists[i].onTour === '1' && typeof discogsPayLoad.artists[i].event !== 'undefined') {
+
+            artistHTML += '<a href="' + discogsPayLoad.artists[i].event.ticket_url + '" target="newtab">' + 'On Tour' + '</a>';
         }
 
         artistHTML += '</div>'; //  closing tag card action
