@@ -219,7 +219,7 @@ function loadLastFMArtist(discogsPayLoad) {
 
 function loadBandsInTown(i, discogsPayLoad, userLocation) {
 
-    var BandsInTownApi = 'http://api.bandsintown.com/artists/' + discogsPayLoad.artists[i].name + '/events/search.json?callback=?&api_version=2.0&app_id=my music chest&location=' + userLocation.city + ',' + userLocation.region_code + '&radius=50';
+    var BandsInTownApi = 'https://api.bandsintown.com/artists/' + discogsPayLoad.artists[i].name + '/events/search.json?callback=?&api_version=2.0&app_id=my music chest&location=' + userLocation.city + ',' + userLocation.region_code + '&radius=50';
     $.getJSON(BandsInTownApi, function(data) {
 
     }).done(function(data) {
