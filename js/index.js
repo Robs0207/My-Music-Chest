@@ -203,9 +203,9 @@ function loadLastFMArtist(discogsPayLoad) {
 
             }
 
-            if (discogsPayLoad.artists[i].onTour === '1') {
-                loadBandsInTown(i, discogsPayLoad, userLocation);
-            }
+            //         if (discogsPayLoad.artists[i].onTour === '1') {
+            loadBandsInTown(i, discogsPayLoad, userLocation);
+            //        }
 
         }).fail(function(data, success) {
 
@@ -236,7 +236,10 @@ function loadBandsInTown(i, discogsPayLoad, userLocation) {
 
     }).fail(function(data) {
 
-        renderLoadingErrorView('BandsInTown', data);
+        if (data.status != '404') {
+
+            renderLoadingErrorView('BandsInTown', data);
+        }
 
     }).always(function() {
 
@@ -351,9 +354,10 @@ function renderArtistCards(discogsPayLoad) {
         artistHTML += '<div class="card-stacked">';
         artistHTML += '<div class="card-action">';
 
-        if (discogsPayLoad.artists[i].onTour === '1' && typeof discogsPayLoad.artists[i].event !== 'undefined') {
+        if (typeof discogsPayLoad.artists[i].event !== 'undefined') {
 
             artistHTML += '<a href="' + discogsPayLoad.artists[i].event.ticket_url + '" target="newtab">' + 'On Tour' + '</a>';
+            artistHTML += discogsPayLoad.artists[i].event.title + ' on ' + discogsPayLoad.artists[i].event.datetime;
         }
 
         artistHTML += '</div>'; //  closing tag card action
